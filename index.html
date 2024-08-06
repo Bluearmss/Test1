@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noir Gallery</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        header {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 1rem;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            transition: background-color 0.3s ease;
+        }
+        header.scrolled {
+            background-color: rgba(0, 0, 0, 0.95);
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #bb86fc;
+            text-decoration: none;
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        nav ul {
+            list-style-type: none;
+            display: flex;
+        }
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+        nav ul li a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.3s ease;
+        }
+        nav ul li a:hover, nav ul li a.active {
+            color: #bb86fc;
+        }
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            padding: 6rem 1.5rem 1.5rem;
+        }
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        .gallery-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: filter 0.3s ease;
+        }
+        .gallery-item:hover img {
+            filter: brightness(0.7);
+        }
+        .gallery-item .overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #e0e0e0;
+            padding: 1rem;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+        .gallery-item:hover .overlay {
+            transform: translateY(0);
+        }
+        .overlay h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: #bb86fc;
+        }
+        .overlay p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        footer {
+            background-color: #1e1e1e;
+            color: #888;
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+            font-size: 0.8rem;
+        }
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            nav ul {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header id="header">
+        <nav>
+            <a href="#" class="logo">Noir Gallery</a>
+            <ul>
+                <li><a href="#" id="all" class="active">All</a></li>
+                <li><a href="#" id="digital">Digital</a></li>
+                <li><a href="#" id="traditional">Traditional</a></li>
+                <li><a href="#" id="photography">Photography</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main class="gallery" id="gallery">
+        <!-- Gallery items will be dynamically added here -->
+    </main>
+    <footer>
+        <p>&copy; 2024 Noir Gallery. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const galleryData = [
+            { id: 1, title: "Neon City", artist: "John Doe", category: "digital", image: "/api/placeholder/600/400" },
+            { id: 2, title: "Midnight Oil", artist: "Jane Smith", category: "traditional", image: "/api/placeholder/600/400" },
+            { id: 3, title: "Urban Shadows", artist: "Mike Johnson", category: "photography", image: "/api/placeholder/600/400" },
+            { id: 4, title: "Cyber Punk", artist: "Emily Brown", category: "digital", image: "/api/placeholder/600/400" },
+            { id: 5, title: "Noir Portrait", artist: "David Lee", category: "traditional", image: "/api/placeholder/600/400" },
+            { id: 6, title: "Night Life", artist: "Sarah Wilson", category: "photography", image: "/api/placeholder/600/400" },
+            { id: 7, title: "Future Shock", artist: "Chris Taylor", category: "digital", image: "/api/placeholder/600/400" },
+            { id: 8, title: "Shadow Play", artist: "Lisa Anderson", category: "traditional", image: "/api/placeholder/600/400" },
+            { id: 9, title: "Neon Dreams", artist: "Tom Harris", category: "photography", image: "/api/placeholder/600/400" },
+        ];
+
+        const gallery = document.getElementById('gallery');
+        const navLinks = document.querySelectorAll('nav ul li a');
+        const header = document.getElementById('header');
+
+        function createGalleryItem(item) {
+            const galleryItem = document.createElement('div');
+            galleryItem.className = 'gallery-item';
+            galleryItem.innerHTML = `
+                <img src="${item.image}" alt="${item.title}">
+                <div class="overlay">
+                    <h3>${item.title}</h3>
+                    <p>by ${item.artist}</p>
+                </div>
+            `;
+            return galleryItem;
+        }
+
+        function displayGallery(category = 'all') {
+            gallery.innerHTML = '';
+            const filteredData = category === 'all' 
+                ? galleryData 
+                : galleryData.filter(item => item.category === category);
+            
+            filteredData.forEach(item => {
+                gallery.appendChild(createGalleryItem(item));
+            });
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                navLinks.forEach(l => l.classList.remove('active'));
+                e.target.classList.add('active');
+                const category = e.target.id;
+                displayGallery(category);
+            });
+        });
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Initial display
+        displayGallery();
+    </script>
+</body>
+</html>
